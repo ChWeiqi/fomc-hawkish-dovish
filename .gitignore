@@ -139,3 +139,6 @@ CA_discriminator_classification/
 pretrained_roberta_output/
 bankruptcy/
 data/speech_testimony_text_data/
+
+*.DS_STORE
+*.idea

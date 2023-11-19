@@ -7,7 +7,7 @@ model = AutoModelForSequenceClassification.from_pretrained("gtfintechlab/FOMC-Ro
 
 config = AutoConfig.from_pretrained("gtfintechlab/FOMC-RoBERTa")
 
-classifier = pipeline('text-classification', model=model, tokenizer=tokenizer, config=config, device=0, framework="pt")
+classifier = pipeline('text-classification', model=model, tokenizer=tokenizer, config=config, device=-1, framework="pt")
 results = classifier(["Such a directive would imply that any tightening should be implemented promptly if developments were perceived as pointing to rising inflation.", 
                       "The International Monetary Fund projects that global economic growth in 2019 will be the slowest since the financial crisis."], 
                       batch_size=128, truncation="only_first")

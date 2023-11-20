@@ -302,7 +302,7 @@ def train_lm_price_change_experiments(gpu_numbers: str, train_data_path_prefix: 
 
                 count += 1
                 print(f'Experiment {count} of {len(seeds) * len(batch_sizes) * len(learning_rates)}:')
-                print("Seed: %d, Batch Size: %d, Learning Rate: %d" % (seed, batch_size, learning_rate))
+                print("Seed: %d, Batch Size: %d, Learning Rate: %f" % (seed, batch_size, learning_rate))
                 
                 train_data_path = train_data_path_prefix + "-" + str(seed) + ".xlsx"
                 test_data_path = test_data_path_prefix + "-" + str(seed) + ".xlsx"
@@ -319,7 +319,13 @@ def train_lm_price_change_experiments(gpu_numbers: str, train_data_path_prefix: 
                 with open(checkpoint_save_path, 'w') as outfile:
                     json.dump(last_saved_data, outfile, indent=4)
 
-                print("Save Checkpoint:[%d, %d, %d] successfully." % (seed, batch_size, learning_rate))
+                print("Save Checkpoint:[%d, %d, %f] successfully." % (seed, batch_size, learning_rate))
+                k += 1
+            j += 1
+            k = 0
+        i += 1
+        j = 0
+        k = 0
 
 
 if __name__=='__main__':

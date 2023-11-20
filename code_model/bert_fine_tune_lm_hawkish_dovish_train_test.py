@@ -309,6 +309,8 @@ def train_lm_price_change_experiments(gpu_numbers: str, train_data_path_prefix: 
 
                 results.append(train_lm_hawkish_dovish(gpu_numbers, train_data_path, test_data_path, language_model_to_use, seed, batch_size, learning_rate, save_model_path))
                 df = pd.DataFrame(results, columns=["Seed", "Learning Rate", "Batch Size", "Val Cross Entropy", "Val Accuracy", "Val F1 Score", "Test Cross Entropy", "Test Accuracy", "Test F1 Score"])
+                if os.path.exists("../grid_search_results_repro") == False:
+                    os.mkdir("../grid_search_results_repro")
                 df.to_excel(f'../grid_search_results_repro/final_{data_category}_{language_model_to_use}.xlsx', index=False)
 
                 last_saved_data["seed"] = i

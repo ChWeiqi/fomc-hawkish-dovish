@@ -285,13 +285,13 @@ def train_lm_price_change_experiments(gpu_numbers: str, train_data_path_prefix: 
                                                                                                        batch_sizes[last_saved_data["batch_size"]],
                                                                                                        learning_rates[last_saved_data["learning_rate"]]))
     else:
-        last_saved_data = {"seed":0, "batch_size":0, "learning_rate":0}
+        last_saved_data = {"seed": 0, "batch_size": 0, "learning_rate": 0}
         print("No checkpoint found, start from the beginning.")
 
     print("Start Training, Language Model:%s, Data Category:%s" % (language_model_to_use, data_category))
-    i = seeds[last_saved_data["seed"]]
-    j = batch_sizes[last_saved_data["batch_size"]]
-    k = batch_sizes[last_saved_data["learning_rate"]]
+    i = last_saved_data["seed"]
+    j = last_saved_data["batch_size"]
+    k = last_saved_data["learning_rate"]
     while i < len(seeds):
         while j < len(batch_sizes):
             while k < len(learning_rates):

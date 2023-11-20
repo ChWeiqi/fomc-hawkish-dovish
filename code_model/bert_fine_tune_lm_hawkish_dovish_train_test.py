@@ -166,7 +166,10 @@ def train_lm_hawkish_dovish(gpu_numbers: str, train_data_path: str, test_data_pa
 
     eps = 1e-2
 
+    print("max num epochs:%d" % max_num_epochs)
+
     for epoch in range(max_num_epochs):
+        print("epoch(%d)" % epoch)
         if (early_stopping_count >= max_early_stopping):
             break
         for phase in ['train', 'val']:
@@ -273,6 +276,7 @@ def train_lm_price_change_experiments(gpu_numbers: str, train_data_path_prefix: 
     batch_sizes = [32, 16, 8, 4]
     learning_rates = [1e-4, 1e-5, 1e-6, 1e-7]
     count = 0
+    save_model_path = "../model_data/final_model"
     for i, seed in enumerate(seeds):
         for k, batch_size in enumerate(batch_sizes):
             for j, learning_rate in enumerate(learning_rates):
@@ -283,7 +287,7 @@ def train_lm_price_change_experiments(gpu_numbers: str, train_data_path_prefix: 
                 train_data_path = train_data_path_prefix + "-" + str(seed) + ".xlsx"
                 test_data_path = test_data_path_prefix + "-" + str(seed) + ".xlsx"
 
-                results.append(train_lm_hawkish_dovish(gpu_numbers, train_data_path, test_data_path, language_model_to_use, seed, batch_size, learning_rate, None))
+                results.append(train_lm_hawkish_dovish(gpu_numbers, train_data_path, test_data_path, language_model_to_use, seed, batch_size, learning_rate, save_model_path))
                 df = pd.DataFrame(results, columns=["Seed", "Learning Rate", "Batch Size", "Val Cross Entropy", "Val Accuracy", "Val F1 Score", "Test Cross Entropy", "Test Accuracy", "Test F1 Score"])
                 df.to_excel(f'../grid_search_results/final_{data_category}_{language_model_to_use}.xlsx', index=False)
 

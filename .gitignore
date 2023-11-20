@@ -143,3 +143,4 @@ data/speech_testimony_text_data/
 *.DS_STORE
 *.idea
 grid_search_results_repro/*
+*checkpoint*

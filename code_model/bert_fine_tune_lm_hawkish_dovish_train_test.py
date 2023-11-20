@@ -277,12 +277,32 @@ def train_lm_price_change_experiments(gpu_numbers: str, train_data_path_prefix: 
     learning_rates = [1e-4, 1e-5, 1e-6, 1e-7]
     count = 0
     save_model_path = "../model_data/final_model"
-    for i, seed in enumerate(seeds):
-        for k, batch_size in enumerate(batch_sizes):
-            for j, learning_rate in enumerate(learning_rates):
+    checkpoint_save_path = "../model_data/checkpoint"
+    import json
+    if os.path.exists(checkpoint_save_path):
+        last_saved_data = json.load(open(checkpoint_save_path))
+        print("Loading from checkpoint successfully, seeds: %d, batch_size: %d, learning_rate: %f" % (seeds[last_saved_data["seed"]],
+                                                                                                       batch_sizes[last_saved_data["batch_size"]],
+                                                                                                       learning_rates[last_saved_data["learning_rate"]]))
+    else:
+        last_saved_data = {"seed":0, "batch_size":0, "learning_rate":0}
+        print("No checkpoint found, start from the beginning.")
+
+    print("Start Training, Language Model:%s, Data Category:%s" % (language_model_to_use, data_category))
+    i = seeds[last_saved_data["seed"]]
+    j = batch_sizes[last_saved_data["batch_size"]]
+    k = batch_sizes[last_saved_data["learning_rate"]]
+    while i < len(seeds):
+        while j < len(batch_sizes):
+            while k < len(learning_rates):
+
+                seed = seeds[i]
+                batch_size = batch_sizes[j]
+                learning_rate = learning_rates[k]
 
                 count += 1
                 print(f'Experiment {count} of {len(seeds) * len(batch_sizes) * len(learning_rates)}:')
+                print("Seed: %d, Batch Size: %d, Learning Rate: %d" % (seed, batch_size, learning_rate))
                 
                 train_data_path = train_data_path_prefix + "-" + str(seed) + ".xlsx"
                 test_data_path = test_data_path_prefix + "-" + str(seed) + ".xlsx"
@@ -290,6 +310,16 @@ def train_lm_price_change_experiments(gpu_numbers: str, train_data_path_prefix: 
                 results.append(train_lm_hawkish_dovish(gpu_numbers, train_data_path, test_data_path, language_model_to_use, seed, batch_size, learning_rate, save_model_path))
                 df = pd.DataFrame(results, columns=["Seed", "Learning Rate", "Batch Size", "Val Cross Entropy", "Val Accuracy", "Val F1 Score", "Test Cross Entropy", "Test Accuracy", "Test F1 Score"])
                 df.to_excel(f'../grid_search_results/final_{data_category}_{language_model_to_use}.xlsx', index=False)
+
+                last_saved_data["seed"] = i
+                last_saved_data["batch_size"] = j
+                last_saved_data["learning_rate"] = k
+
+                # write to file
+                with open(checkpoint_save_path, 'w') as outfile:
+                    json.dump(last_saved_data, outfile, indent=4)
+
+                print("Save Checkpoint:[%d, %d, %d] successfully." % (seed, batch_size, learning_rate))
 
 
 if __name__=='__main__':

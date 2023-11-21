@@ -272,7 +272,7 @@ def train_lm_hawkish_dovish(gpu_numbers: str, train_data_path: str, test_data_pa
     if save_model_path != None:
         save_path = save_model_path + '-' + str(seed) + '-' + str(learning_rate) + '-' + str(batch_size)
         model.save_pretrained(save_path)
-        tokenizer.save_pretrained(savepth)
+        tokenizer.save_pretrained(save_path)
 
     return experiment_results
 
@@ -317,6 +317,8 @@ def train_lm_price_change_experiments(gpu_numbers: str, train_data_path_prefix: 
                 train_data_path = train_data_path_prefix + "-" + str(seed) + ".xlsx"
                 test_data_path = test_data_path_prefix + "-" + str(seed) + ".xlsx"
 
+                save_path = save_model_path + '-' + str(seed) + '-' + str(learning_rate) + '-' + str(batch_size)
+                print(save_path)
                 results.append(train_lm_hawkish_dovish(gpu_numbers, train_data_path, test_data_path, language_model_to_use, seed, batch_size, learning_rate, save_model_path))
                 df = pd.DataFrame(results, columns=["Seed", "Learning Rate", "Batch Size", "Val Cross Entropy", "Val Accuracy", "Val F1 Score", "Test Cross Entropy", "Test Accuracy", "Test F1 Score"])
                 if os.path.exists("../grid_search_results_repro") == False:

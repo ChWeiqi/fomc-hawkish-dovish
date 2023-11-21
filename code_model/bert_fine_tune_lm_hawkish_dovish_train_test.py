@@ -3,7 +3,7 @@ import sys
 from time import time, sleep
 import pandas as pd
 from transformers import BertForSequenceClassification, BertTokenizerFast, RobertaTokenizerFast, RobertaForSequenceClassification, AutoTokenizer, AutoModelForSequenceClassification, XLNetForSequenceClassification, XLNetTokenizerFast
-from transformers import XLMRobertaTokenizerFast, XLMRobertaForSequenceClassification
+from transformers import XLMRobertaTokenizerFast, XLMRobertaForSequenceClassification, AutoModelForMaskedLM
 import torch
 from torch.utils.data import TensorDataset, DataLoader
 import torch.optim as optim
@@ -54,7 +54,7 @@ def train_lm_hawkish_dovish(gpu_numbers: str, train_data_path: str, test_data_pa
         elif language_model_to_use == 'xlm-roberta-base':
             tokenizer = XLMRobertaTokenizerFast.from_pretrained("xlm-roberta-base", do_lower_case=True, do_basic_tokenize=True)
         elif language_model_to_use == 'xlm-roberta-large':
-            tokenizer = XLMRobertaTokenizerFast.from_pretrained("xlm-roberta-large", do_lower_case=True, do_basic_tokenize=True)
+            tokenizer = AutoTokenizer.from_pretrained("xlm-roberta-large", do_lower_case=True, do_basic_tokenize=True)
         else:
             return -1
     except Exception as e:
@@ -81,7 +81,7 @@ def train_lm_hawkish_dovish(gpu_numbers: str, train_data_path: str, test_data_pa
         elif language_model_to_use == 'xlm-roberta-base':
             tokenizer = XLMRobertaTokenizerFast.from_pretrained("xlm-roberta-base", do_lower_case=True, do_basic_tokenize=True)
         elif language_model_to_use == 'xlm-roberta-large':
-            tokenizer = XLMRobertaTokenizerFast.from_pretrained("xlm-roberta-large", do_lower_case=True, do_basic_tokenize=True)
+            tokenizer = AutoTokenizer.from_pretrained("xlm-roberta-large", do_lower_case=True, do_basic_tokenize=True)
         else:
             return -1
 
@@ -137,8 +137,8 @@ def train_lm_hawkish_dovish(gpu_numbers: str, train_data_path: str, test_data_pa
             model = XLNetForSequenceClassification.from_pretrained("xlnet-base-cased", num_labels=3).to(device)
         elif language_model_to_use == 'xlm-roberta-base':
             model = XLMRobertaForSequenceClassification.from_pretrained("xlm-roberta-base", num_labels=3).to(device)
-        elif language_model_to_use == 'xlm_roberta_large':
-            model = XLMRobertaForSequenceClassification.from_pretrained("xlm-roberta-large", num_labels=3).to(device)
+        elif language_model_to_use == 'xlm-roberta-large':
+            model = AutoModelForMaskedLM.from_pretrained("xlm-roberta-large", num_labels=3).to(device)
         else:
             return -1
     except:
@@ -164,7 +164,7 @@ def train_lm_hawkish_dovish(gpu_numbers: str, train_data_path: str, test_data_pa
         elif language_model_to_use == 'xlm-roberta-base':
             model = XLMRobertaForSequenceClassification.from_pretrained("xlm-roberta-base", num_labels=3).to(device)
         elif language_model_to_use == 'xlm-roberta-large':
-            model = XLMRobertaForSequenceClassification.from_pretrained("xlm-roberta-large", num_labels=3).to(device)
+            model = AutoModelForMaskedLM.from_pretrained("xlm-roberta-large", num_labels=3).to(device)
         else:
             return -1
 

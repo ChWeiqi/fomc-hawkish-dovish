@@ -4,6 +4,7 @@ from time import time, sleep
 import pandas as pd
 from transformers import BertForSequenceClassification, BertTokenizerFast, RobertaTokenizerFast, RobertaForSequenceClassification, AutoTokenizer, AutoModelForSequenceClassification, XLNetForSequenceClassification, XLNetTokenizerFast
 from transformers import XLMRobertaTokenizerFast, XLMRobertaForSequenceClassification, AutoModelForMaskedLM
+from transformers import AlbertTokenizer, AlbertModel
 import torch
 from torch.utils.data import TensorDataset, DataLoader
 import torch.optim as optim
@@ -55,6 +56,8 @@ def train_lm_hawkish_dovish(gpu_numbers: str, train_data_path: str, test_data_pa
             tokenizer = XLMRobertaTokenizerFast.from_pretrained("xlm-roberta-base", do_lower_case=True, do_basic_tokenize=True)
         elif language_model_to_use == 'xlm-roberta-large':
             tokenizer = XLMRobertaTokenizerFast.from_pretrained("xlm-roberta-large", do_lower_case=True, do_basic_tokenize=True)
+        elif language_model_to_use == 'albert-base-v2':
+            tokenizer = AlbertTokenizer.from_pretrained("albert-base-v2", do_lower_case=True, do_basic_tokenize=True)
         else:
             return -1
     except Exception as e:
@@ -82,6 +85,8 @@ def train_lm_hawkish_dovish(gpu_numbers: str, train_data_path: str, test_data_pa
             tokenizer = XLMRobertaTokenizerFast.from_pretrained("xlm-roberta-base", do_lower_case=True, do_basic_tokenize=True)
         elif language_model_to_use == 'xlm-roberta-large':
             tokenizer = XLMRobertaTokenizerFast.from_pretrained("xlm-roberta-large", do_lower_case=True, do_basic_tokenize=True)
+        elif language_model_to_use == 'albert-base-v2':
+            tokenizer = AlbertTokenizer.from_pretrained("albert-base-v2", do_lower_case=True, do_basic_tokenize=True)
         else:
             return -1
 
@@ -139,6 +144,8 @@ def train_lm_hawkish_dovish(gpu_numbers: str, train_data_path: str, test_data_pa
             model = XLMRobertaForSequenceClassification.from_pretrained("xlm-roberta-base", num_labels=3).to(device)
         elif language_model_to_use == 'xlm-roberta-large':
             model = XLMRobertaForSequenceClassification.from_pretrained("xlm-roberta-large", num_labels=3).to(device)
+        elif language_model_to_use == 'albert-base-v2':
+            model = AlbertModel.from_pretrained("albert-base-v2", num_labels=3).to(device)
         else:
             return -1
     except:
@@ -165,6 +172,8 @@ def train_lm_hawkish_dovish(gpu_numbers: str, train_data_path: str, test_data_pa
             model = XLMRobertaForSequenceClassification.from_pretrained("xlm-roberta-base", num_labels=3).to(device)
         elif language_model_to_use == 'xlm-roberta-large':
             model = XLMRobertaForSequenceClassification.from_pretrained("xlm-roberta-large", num_labels=3).to(device)
+        elif language_model_to_use == 'albert-base-v2':
+            model = AlbertModel.from_pretrained("albert-base-v2", num_labels=3).to(device)
         else:
             return -1
 
@@ -291,7 +300,7 @@ def train_lm_price_change_experiments(gpu_numbers: str, train_data_path_prefix: 
     """
     results = []
     seeds = [5768, 78516, 944601]
-    batch_sizes = [8, 4]
+    batch_sizes = [16, 8, 4]
     learning_rates = [1e-4, 1e-5, 1e-6, 1e-7]
     count = 0
     save_model_path = "../model_data/final_model"
@@ -356,7 +365,7 @@ if __name__=='__main__':
     start_t = time()
 
     # experiments
-    for language_model_to_use in ["xlm-roberta-large"]:#["roberta", "roberta-large", "bert", "bert-large", "finbert", "flangbert", "flangroberta"]: #["xlnet", "pretrain_roberta"]:#
+    for language_model_to_use in ["albert-base-v2"]:#["roberta", "roberta-large", "bert", "bert-large", "finbert", "flangbert", "flangroberta"]: #["xlnet", "pretrain_roberta"]:#
         for data_category in ["lab-manual-combine", "lab-manual-split-combine"]:
             train_data_path_prefix = "../training_data/test-and-training/training_data/" + data_category + "-train"
             test_data_path_prefix = "../training_data/test-and-training/test_data/" + data_category + "-test"

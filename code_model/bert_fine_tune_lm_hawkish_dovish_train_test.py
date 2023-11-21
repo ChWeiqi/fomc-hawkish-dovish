@@ -335,7 +335,7 @@ if __name__=='__main__':
     start_t = time()
 
     # experiments
-    for language_model_to_use in ["xlnet", "pretrain_roberta"]:#["roberta", "roberta-large", "bert", "bert-large", "finbert", "flangbert", "flangroberta"]: #["xlnet", "pretrain_roberta"]:#
+    for language_model_to_use in ["pretrain_roberta"]:#["roberta", "roberta-large", "bert", "bert-large", "finbert", "flangbert", "flangroberta"]: #["xlnet", "pretrain_roberta"]:#
         for data_category in ["lab-manual-combine", "lab-manual-sp", "lab-manual-mm", "lab-manual-pc", "lab-manual-mm-split", "lab-manual-pc-split", "lab-manual-sp-split", "lab-manual-split-combine"]:
             train_data_path_prefix = "../training_data/test-and-training/training_data/" + data_category + "-train"
             test_data_path_prefix = "../training_data/test-and-training/test_data/" + data_category + "-test"

@@ -291,7 +291,7 @@ def train_lm_price_change_experiments(gpu_numbers: str, train_data_path_prefix: 
     """
     results = []
     seeds = [5768, 78516, 944601]
-    batch_sizes = [16, 8, 4]
+    batch_sizes = [8, 4]
     learning_rates = [1e-4, 1e-5, 1e-6, 1e-7]
     count = 0
     save_model_path = "../model_data/final_model"

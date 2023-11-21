@@ -54,7 +54,7 @@ def train_lm_hawkish_dovish(gpu_numbers: str, train_data_path: str, test_data_pa
         elif language_model_to_use == 'xlm-roberta-base':
             tokenizer = XLMRobertaTokenizerFast.from_pretrained("xlm-roberta-base", do_lower_case=True, do_basic_tokenize=True)
         elif language_model_to_use == 'xlm-roberta-large':
-            tokenizer = AutoTokenizer.from_pretrained("xlm-roberta-large", do_lower_case=True, do_basic_tokenize=True)
+            tokenizer = XLMRobertaTokenizerFast.from_pretrained("xlm-roberta-large", do_lower_case=True, do_basic_tokenize=True)
         else:
             return -1
     except Exception as e:
@@ -81,7 +81,7 @@ def train_lm_hawkish_dovish(gpu_numbers: str, train_data_path: str, test_data_pa
         elif language_model_to_use == 'xlm-roberta-base':
             tokenizer = XLMRobertaTokenizerFast.from_pretrained("xlm-roberta-base", do_lower_case=True, do_basic_tokenize=True)
         elif language_model_to_use == 'xlm-roberta-large':
-            tokenizer = AutoTokenizer.from_pretrained("xlm-roberta-large", do_lower_case=True, do_basic_tokenize=True)
+            tokenizer = XLMRobertaTokenizerFast.from_pretrained("xlm-roberta-large", do_lower_case=True, do_basic_tokenize=True)
         else:
             return -1
 
@@ -138,7 +138,7 @@ def train_lm_hawkish_dovish(gpu_numbers: str, train_data_path: str, test_data_pa
         elif language_model_to_use == 'xlm-roberta-base':
             model = XLMRobertaForSequenceClassification.from_pretrained("xlm-roberta-base", num_labels=3).to(device)
         elif language_model_to_use == 'xlm-roberta-large':
-            model = AutoModelForMaskedLM.from_pretrained("xlm-roberta-large", num_labels=3).to(device)
+            model = XLMRobertaForSequenceClassification.from_pretrained("xlm-roberta-large", num_labels=3).to(device)
         else:
             return -1
     except:
@@ -164,7 +164,7 @@ def train_lm_hawkish_dovish(gpu_numbers: str, train_data_path: str, test_data_pa
         elif language_model_to_use == 'xlm-roberta-base':
             model = XLMRobertaForSequenceClassification.from_pretrained("xlm-roberta-base", num_labels=3).to(device)
         elif language_model_to_use == 'xlm-roberta-large':
-            model = AutoModelForMaskedLM.from_pretrained("xlm-roberta-large", num_labels=3).to(device)
+            model = XLMRobertaForSequenceClassification.from_pretrained("xlm-roberta-large", num_labels=3).to(device)
         else:
             return -1
 

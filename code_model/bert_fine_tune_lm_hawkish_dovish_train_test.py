@@ -357,7 +357,7 @@ if __name__=='__main__':
 
     # experiments
     for language_model_to_use in ["xlm-roberta-large"]:#["roberta", "roberta-large", "bert", "bert-large", "finbert", "flangbert", "flangroberta"]: #["xlnet", "pretrain_roberta"]:#
-        for data_category in ["lab-manual-split-combine"]:
+        for data_category in ["lab-manual-combine", "lab-manual-split-combine"]:
             train_data_path_prefix = "../training_data/test-and-training/training_data/" + data_category + "-train"
             test_data_path_prefix = "../training_data/test-and-training/test_data/" + data_category + "-test"
             train_lm_price_change_experiments(gpu_numbers="0", train_data_path_prefix=train_data_path_prefix, test_data_path_prefix=test_data_path_prefix, language_model_to_use=language_model_to_use, data_category=data_category)

@@ -270,8 +270,9 @@ def train_lm_hawkish_dovish(gpu_numbers: str, train_data_path: str, test_data_pa
 
     # save model
     if save_model_path != None:
-        model.save_pretrained(save_model_path)
-        tokenizer.save_pretrained(save_model_path)
+        save_path = save_model_path + '-' + str(seed) + '-' + str(learning_rate) + '-' + str(batch_size)
+        model.save_pretrained(save_path)
+        tokenizer.save_pretrained(savepth)
 
     return experiment_results
 

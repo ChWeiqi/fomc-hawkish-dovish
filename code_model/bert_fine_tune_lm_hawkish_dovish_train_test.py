@@ -53,6 +53,8 @@ def train_lm_hawkish_dovish(gpu_numbers: str, train_data_path: str, test_data_pa
             tokenizer = XLNetTokenizerFast.from_pretrained("xlnet-base-cased", do_lower_case=True, do_basic_tokenize=True)
         elif language_model_to_use == 'xlm-roberta-base':
             tokenizer = XLMRobertaTokenizerFast.from_pretrained("xlm-roberta-base", do_lower_case=True, do_basic_tokenize=True)
+        elif language_model_to_use == 'xlm-roberta-large':
+            tokenizer = XLMRobertaTokenizerFast.from_pretrained("xlm-roberta-large", do_lower_case=True, do_basic_tokenize=True)
         else:
             return -1
     except Exception as e:
@@ -78,6 +80,8 @@ def train_lm_hawkish_dovish(gpu_numbers: str, train_data_path: str, test_data_pa
             tokenizer = XLNetTokenizerFast.from_pretrained("xlnet-base-cased", do_lower_case=True, do_basic_tokenize=True)
         elif language_model_to_use == 'xlm-roberta-base':
             tokenizer = XLMRobertaTokenizerFast.from_pretrained("xlm-roberta-base", do_lower_case=True, do_basic_tokenize=True)
+        elif language_model_to_use == 'xlm-roberta-large':
+            tokenizer = XLMRobertaTokenizerFast.from_pretrained("xlm-roberta-large", do_lower_case=True, do_basic_tokenize=True)
         else:
             return -1
 
@@ -133,6 +137,8 @@ def train_lm_hawkish_dovish(gpu_numbers: str, train_data_path: str, test_data_pa
             model = XLNetForSequenceClassification.from_pretrained("xlnet-base-cased", num_labels=3).to(device)
         elif language_model_to_use == 'xlm-roberta-base':
             model = XLMRobertaForSequenceClassification.from_pretrained("xlm-roberta-base", num_labels=3).to(device)
+        elif language_model_to_use == 'xlm_roberta_large':
+            model = XLMRobertaForSequenceClassification.from_pretrained("xlm-roberta-large", num_labels=3).to(device)
         else:
             return -1
     except:
@@ -157,6 +163,8 @@ def train_lm_hawkish_dovish(gpu_numbers: str, train_data_path: str, test_data_pa
             model = XLNetForSequenceClassification.from_pretrained("xlnet-base-cased", num_labels=3).to(device)
         elif language_model_to_use == 'xlm-roberta-base':
             model = XLMRobertaForSequenceClassification.from_pretrained("xlm-roberta-base", num_labels=3).to(device)
+        elif language_model_to_use == 'xlm-roberta-large':
+            model = XLMRobertaForSequenceClassification.from_pretrained("xlm-roberta-large", num_labels=3).to(device)
         else:
             return -1
 
@@ -283,7 +291,7 @@ def train_lm_price_change_experiments(gpu_numbers: str, train_data_path_prefix: 
     """
     results = []
     seeds = [5768, 78516, 944601]
-    batch_sizes = [32, 16, 8, 4]
+    batch_sizes = [16, 8, 4]
     learning_rates = [1e-4, 1e-5, 1e-6, 1e-7]
     count = 0
     save_model_path = "../model_data/final_model"
@@ -347,8 +355,8 @@ if __name__=='__main__':
     start_t = time()
 
     # experiments
-    for language_model_to_use in ["xlm-roberta-base"]:#["roberta", "roberta-large", "bert", "bert-large", "finbert", "flangbert", "flangroberta"]: #["xlnet", "pretrain_roberta"]:#
-        for data_category in ["lab-manual-mm-split", "lab-manual-pc-split", "lab-manual-sp-split", "lab-manual-split-combine"]:
+    for language_model_to_use in ["xlm-roberta-large"]:#["roberta", "roberta-large", "bert", "bert-large", "finbert", "flangbert", "flangroberta"]: #["xlnet", "pretrain_roberta"]:#
+        for data_category in ["lab-manual-split-combine"]:
             train_data_path_prefix = "../training_data/test-and-training/training_data/" + data_category + "-train"
             test_data_path_prefix = "../training_data/test-and-training/test_data/" + data_category + "-test"
             train_lm_price_change_experiments(gpu_numbers="0", train_data_path_prefix=train_data_path_prefix, test_data_path_prefix=test_data_path_prefix, language_model_to_use=language_model_to_use, data_category=data_category)

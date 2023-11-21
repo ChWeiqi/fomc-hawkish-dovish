@@ -3,6 +3,7 @@ import sys
 from time import time, sleep
 import pandas as pd
 from transformers import BertForSequenceClassification, BertTokenizerFast, RobertaTokenizerFast, RobertaForSequenceClassification, AutoTokenizer, AutoModelForSequenceClassification, XLNetForSequenceClassification, XLNetTokenizerFast
+from transformers import XLMRobertaTokenizerFast, XLMRobertaForSequenceClassification
 import torch
 from torch.utils.data import TensorDataset, DataLoader
 import torch.optim as optim
@@ -50,6 +51,8 @@ def train_lm_hawkish_dovish(gpu_numbers: str, train_data_path: str, test_data_pa
             tokenizer = AutoTokenizer.from_pretrained("../pretrained_roberta_output", do_lower_case=True, do_basic_tokenize=True)
         elif language_model_to_use == 'xlnet':
             tokenizer = XLNetTokenizerFast.from_pretrained("xlnet-base-cased", do_lower_case=True, do_basic_tokenize=True)
+        elif language_model_to_use == 'xlm-roberta-base':
+            tokenizer = XLMRobertaTokenizerFast.from_pretrained("xlm-roberta-base", do_lower_case=True, do_basic_tokenize=True)
         else:
             return -1
     except Exception as e:
@@ -73,6 +76,8 @@ def train_lm_hawkish_dovish(gpu_numbers: str, train_data_path: str, test_data_pa
             tokenizer = AutoTokenizer.from_pretrained("../pretrained_roberta_output", do_lower_case=True, do_basic_tokenize=True)
         elif language_model_to_use == 'xlnet':
             tokenizer = XLNetTokenizerFast.from_pretrained("xlnet-base-cased", do_lower_case=True, do_basic_tokenize=True)
+        elif language_model_to_use == 'xlm-roberta-base':
+            tokenizer = XLMRobertaTokenizerFast.from_pretrained("xlm-roberta-base", do_lower_case=True, do_basic_tokenize=True)
         else:
             return -1
 
@@ -126,6 +131,8 @@ def train_lm_hawkish_dovish(gpu_numbers: str, train_data_path: str, test_data_pa
             model = AutoModelForSequenceClassification.from_pretrained("../pretrained_roberta_output", num_labels=3).to(device)
         elif language_model_to_use == 'xlnet':
             model = XLNetForSequenceClassification.from_pretrained("xlnet-base-cased", num_labels=3).to(device)
+        elif language_model_to_use == 'xlm-roberta-base':
+            model = XLMRobertaForSequenceClassification.from_pretrained("xlm-roberta-base", num_labels=3).to(device)
         else:
             return -1
     except:
@@ -148,6 +155,8 @@ def train_lm_hawkish_dovish(gpu_numbers: str, train_data_path: str, test_data_pa
             model = AutoModelForSequenceClassification.from_pretrained("../pretrained_roberta_output", num_labels=3).to(device)
         elif language_model_to_use == 'xlnet':
             model = XLNetForSequenceClassification.from_pretrained("xlnet-base-cased", num_labels=3).to(device)
+        elif language_model_to_use == 'xlm-roberta-base':
+            model = XLMRobertaForSequenceClassification.from_pretrained("xlm-roberta-base", num_labels=3).to(device)
         else:
             return -1
 
@@ -335,7 +344,7 @@ if __name__=='__main__':
     start_t = time()
 
     # experiments
-    for language_model_to_use in ["pretrain_roberta"]:#["roberta", "roberta-large", "bert", "bert-large", "finbert", "flangbert", "flangroberta"]: #["xlnet", "pretrain_roberta"]:#
+    for language_model_to_use in ["xlm-roberta-base"]:#["roberta", "roberta-large", "bert", "bert-large", "finbert", "flangbert", "flangroberta"]: #["xlnet", "pretrain_roberta"]:#
         for data_category in ["lab-manual-combine", "lab-manual-sp", "lab-manual-mm", "lab-manual-pc", "lab-manual-mm-split", "lab-manual-pc-split", "lab-manual-sp-split", "lab-manual-split-combine"]:
             train_data_path_prefix = "../training_data/test-and-training/training_data/" + data_category + "-train"
             test_data_path_prefix = "../training_data/test-and-training/test_data/" + data_category + "-test"

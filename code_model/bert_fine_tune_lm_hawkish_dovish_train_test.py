@@ -320,9 +320,9 @@ def train_lm_price_change_experiments(gpu_numbers: str, train_data_path_prefix: 
     # seeds = [5768, 78516, 944601]
     seeds = [944601]
     # batch_sizes = [8, 4]
-    batch_sizes = [32]
+    batch_sizes = [4]
     # learning_rates = [1e-4, 1e-5, 1e-6, 1e-7]
-    learning_rates = [1e-5]
+    learning_rates = [1e-6]
     count = 0
     save_model_path = "../model_data/final_model"
     checkpoint_save_path = "../model_data/checkpoint"
@@ -385,7 +385,7 @@ if __name__=='__main__':
     start_t = time()
 
     # experiments
-    for language_model_to_use in ["xlnet"]:#["roberta", "roberta-large", "bert", "bert-large", "finbert", "flangbert", "flangroberta"]: #["xlnet", "pretrain_roberta"]:#
+    for language_model_to_use in ["xlm-roberta-base"]:#["roberta", "roberta-large", "bert", "bert-large", "finbert", "flangbert", "flangroberta"]: #["xlnet", "pretrain_roberta"]:#
         for data_category in ["lab-manual-mm-split"]:
             train_data_path_prefix = "../training_data/test-and-training/training_data/" + data_category + "-train"
             test_data_path_prefix = "../training_data/test-and-training/test_data/" + data_category + "-test"

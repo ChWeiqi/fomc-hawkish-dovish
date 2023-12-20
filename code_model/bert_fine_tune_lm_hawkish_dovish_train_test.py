@@ -3,6 +3,7 @@ import sys
 from time import time, sleep
 import pandas as pd
 from transformers import BertForSequenceClassification, BertTokenizerFast, RobertaTokenizerFast, RobertaForSequenceClassification, AutoTokenizer, AutoModelForSequenceClassification, XLNetForSequenceClassification, XLNetTokenizerFast
+from transformers import XLMRobertaTokenizerFast, XLMRobertaForSequenceClassification, AutoModelForMaskedLM
 import torch
 from torch.utils.data import TensorDataset, DataLoader
 import torch.optim as optim
@@ -50,6 +51,12 @@ def train_lm_hawkish_dovish(gpu_numbers: str, train_data_path: str, test_data_pa
             tokenizer = AutoTokenizer.from_pretrained("../pretrained_roberta_output", do_lower_case=True, do_basic_tokenize=True)
         elif language_model_to_use == 'xlnet':
             tokenizer = XLNetTokenizerFast.from_pretrained("xlnet-base-cased", do_lower_case=True, do_basic_tokenize=True)
+        elif language_model_to_use == 'xlm-roberta-base':
+            tokenizer = XLMRobertaTokenizerFast.from_pretrained("xlm-roberta-base", do_lower_case=True,
+                                                                do_basic_tokenize=True)
+        elif language_model_to_use == 'xlm-roberta-large':
+            tokenizer = XLMRobertaTokenizerFast.from_pretrained("xlm-roberta-large", do_lower_case=True,
+                                                                do_basic_tokenize=True)
         else:
             return -1
     except Exception as e:
@@ -73,6 +80,10 @@ def train_lm_hawkish_dovish(gpu_numbers: str, train_data_path: str, test_data_pa
             tokenizer = AutoTokenizer.from_pretrained("../pretrained_roberta_output", do_lower_case=True, do_basic_tokenize=True)
         elif language_model_to_use == 'xlnet':
             tokenizer = XLNetTokenizerFast.from_pretrained("xlnet-base-cased", do_lower_case=True, do_basic_tokenize=True)
+        elif language_model_to_use == 'xlm-roberta-base':
+            tokenizer = XLMRobertaTokenizerFast.from_pretrained("xlm-roberta-base", do_lower_case=True, do_basic_tokenize=True)
+        elif language_model_to_use == 'xlm-roberta-large':
+            tokenizer = XLMRobertaTokenizerFast.from_pretrained("xlm-roberta-large", do_lower_case=True, do_basic_tokenize=True)
         else:
             return -1
 
@@ -126,6 +137,10 @@ def train_lm_hawkish_dovish(gpu_numbers: str, train_data_path: str, test_data_pa
             model = AutoModelForSequenceClassification.from_pretrained("../pretrained_roberta_output", num_labels=3).to(device)
         elif language_model_to_use == 'xlnet':
             model = XLNetForSequenceClassification.from_pretrained("xlnet-base-cased", num_labels=3).to(device)
+        elif language_model_to_use == 'xlm-roberta-base':
+            model = XLMRobertaForSequenceClassification.from_pretrained("xlm-roberta-base", num_labels=3).to(device)
+        elif language_model_to_use == 'xlm-roberta-large':
+            model = XLMRobertaForSequenceClassification.from_pretrained("xlm-roberta-large", num_labels=3).to(device)
         else:
             return -1
     except:
@@ -148,6 +163,10 @@ def train_lm_hawkish_dovish(gpu_numbers: str, train_data_path: str, test_data_pa
             model = AutoModelForSequenceClassification.from_pretrained("../pretrained_roberta_output", num_labels=3).to(device)
         elif language_model_to_use == 'xlnet':
             model = XLNetForSequenceClassification.from_pretrained("xlnet-base-cased", num_labels=3).to(device)
+        elif language_model_to_use == 'xlm-roberta-base':
+            model = XLMRobertaForSequenceClassification.from_pretrained("xlm-roberta-base", num_labels=3).to(device)
+        elif language_model_to_use == 'xlm-roberta-large':
+            model = XLMRobertaForSequenceClassification.from_pretrained("xlm-roberta-large", num_labels=3).to(device)
         else:
             return -1
 
@@ -166,7 +185,14 @@ def train_lm_hawkish_dovish(gpu_numbers: str, train_data_path: str, test_data_pa
 
     eps = 1e-2
 
+    epoch_result_train = []
+    epoch_result_val = []
+    epoch_result = []
+
+    print("max num epochs:%d" % max_num_epochs)
+
     for epoch in range(max_num_epochs):
+        print("epoch(%d)" % epoch)
         if (early_stopping_count >= max_early_stopping):
             break
         for phase in ['train', 'val']:
@@ -178,8 +204,12 @@ def train_lm_hawkish_dovish(gpu_numbers: str, train_data_path: str, test_data_pa
             
             curr_ce = 0
             curr_accuracy = 0
+            curr_ce_train = 0
+            curr_accuracy_train = 0
             actual = torch.tensor([]).long().to(device)
             pred = torch.tensor([]).long().to(device)
+            actual_train = torch.tensor([]).long().to(device)
+            pred_train = torch.tensor([]).long().to(device)
 
             for input_ids, attention_masks, labels in dataloaders_dict[phase]:
                 input_ids = input_ids.to(device)
@@ -192,15 +222,26 @@ def train_lm_hawkish_dovish(gpu_numbers: str, train_data_path: str, test_data_pa
                     if phase == 'train':
                         loss.backward()
                         optimizer.step()
+                        curr_ce_train += loss.item() * input_ids.size(0)
+                        curr_accuracy_train += torch.sum(torch.max(outputs.logits, 1)[1] == labels).item()
+                        actual_train = torch.cat([actual_train, labels], dim=0)
+                        pred_train = torch.cat([pred_train, torch.max(outputs.logits, 1)[1]], dim=0)
                     else:
                         curr_ce += loss.item() * input_ids.size(0)
                         curr_accuracy += torch.sum(torch.max(outputs.logits, 1)[1] == labels).item()
                         actual = torch.cat([actual, labels], dim=0)
                         pred= torch.cat([pred, torch.max(outputs.logits, 1)[1]], dim=0)
+            if phase== 'train':
+                curr_ce_train = curr_ce_train / len(train)
+                curr_accuracy_train = curr_accuracy_train / len(train)
+                currF1_train = f1_score(actual_train.cpu().detach().numpy(), pred_train.cpu().detach().numpy(), average='weighted')
+                epoch_result_train.append([curr_ce_train, curr_accuracy_train, currF1_train])
+
             if phase == 'val':
                 curr_ce = curr_ce / len(val)
                 curr_accuracy = curr_accuracy / len(val)
                 currF1 = f1_score(actual.cpu().detach().numpy(), pred.cpu().detach().numpy(), average='weighted')
+                epoch_result_val.append([curr_ce, curr_accuracy, currF1])
                 if curr_ce <= best_ce - eps:
                     best_ce = curr_ce
                     early_stopping_count = 0
@@ -255,11 +296,18 @@ def train_lm_hawkish_dovish(gpu_numbers: str, train_data_path: str, test_data_pa
     test_accuracy = test_accuracy/ len(dataset_test)
     test_f1 = f1_score(actual.cpu().detach().numpy(), pred.cpu().detach().numpy(), average='weighted')
     experiment_results = [seed, learning_rate, batch_size, best_ce, best_accuracy, best_f1, test_ce, test_accuracy, test_f1]
+    for train, valid in zip(epoch_result_train, epoch_result_val):
+        combined_result = train + valid
+        epoch_result.append(combined_result)
+
+    df_epoch_results = pd.DataFrame(epoch_result, columns=['Loss_train', 'Accuracy_train', 'F1_train', 'Loss_valid', 'Accuracy_valid', 'F1_valid'])
 
     # save model
     if save_model_path != None:
-        model.save_pretrained(save_model_path)
-        tokenizer.save_pretrained(save_model_path)
+        save_path = save_model_path + language_model_to_use + data_category + '-' + str(seed) + '-' + str(learning_rate) + '-' + str(batch_size)
+        model.save_pretrained(save_path)
+        tokenizer.save_pretrained(save_path)
+        df_epoch_results.to_excel(save_path + "/epoch_results.xlsx", index=True)
 
     return experiment_results
 
@@ -273,19 +321,61 @@ def train_lm_price_change_experiments(gpu_numbers: str, train_data_path_prefix: 
     batch_sizes = [32, 16, 8, 4]
     learning_rates = [1e-4, 1e-5, 1e-6, 1e-7]
     count = 0
-    for i, seed in enumerate(seeds):
-        for k, batch_size in enumerate(batch_sizes):
-            for j, learning_rate in enumerate(learning_rates):
+    save_model_path = "../model_data/final_model"
+    checkpoint_save_path = "../model_data/checkpoint"
+    import json
+    if os.path.exists(checkpoint_save_path):
+        last_saved_data = json.load(open(checkpoint_save_path))
+        print("Loading from checkpoint successfully, seeds: %d, batch_size: %d, learning_rate: %f" % (seeds[last_saved_data["seed"]],
+                                                                                                      batch_sizes[last_saved_data["batch_size"]],
+                                                                                                      learning_rates[last_saved_data["learning_rate"]]))
+    else:
+        last_saved_data = {"seed": 0, "batch_size": 0, "learning_rate": 0}
+        print("No checkpoint found, start from the beginning.")
 
+    print("Start Training, Language Model:%s, Data Category:%s" % (language_model_to_use, data_category))
+    i = last_saved_data["seed"]
+    j = last_saved_data["batch_size"]
+    k = last_saved_data["learning_rate"]
+
+    while i < len(seeds):
+        while j < len(batch_sizes):
+            while k < len(learning_rates):
+
+                seed = seeds[i]
+                batch_size = batch_sizes[j]
+                learning_rate = learning_rates[k]
                 count += 1
                 print(f'Experiment {count} of {len(seeds) * len(batch_sizes) * len(learning_rates)}:')
+                print("Seed: %d, Batch Size: %d, Learning Rate: %f" % (seed, batch_size, learning_rate))
                 
                 train_data_path = train_data_path_prefix + "-" + str(seed) + ".xlsx"
                 test_data_path = test_data_path_prefix + "-" + str(seed) + ".xlsx"
 
-                results.append(train_lm_hawkish_dovish(gpu_numbers, train_data_path, test_data_path, language_model_to_use, seed, batch_size, learning_rate, None))
+                save_path = save_model_path + language_model_to_use + data_category + '-' + str(seed) + '-' + str(learning_rate) + '-' + str(batch_size)
+                print(save_path)
+                results.append(train_lm_hawkish_dovish(gpu_numbers, train_data_path, test_data_path, language_model_to_use, seed, batch_size, learning_rate, save_model_path))
                 df = pd.DataFrame(results, columns=["Seed", "Learning Rate", "Batch Size", "Val Cross Entropy", "Val Accuracy", "Val F1 Score", "Test Cross Entropy", "Test Accuracy", "Test F1 Score"])
-                df.to_excel(f'../grid_search_results/final_{data_category}_{language_model_to_use}.xlsx', index=False)
+                if os.path.exists("../grid_search_results_repro") == False:
+                    os.mkdir("../grid_search_results_repro")
+                df.to_excel(f'../grid_search_results_repro/final_{data_category}_{language_model_to_use}.xlsx',
+                            index=False)
+
+                last_saved_data["seed"] = i
+                last_saved_data["batch_size"] = j
+                last_saved_data["learning_rate"] = k
+
+                # write to file
+                with open(checkpoint_save_path, 'w') as outfile:
+                    json.dump(last_saved_data, outfile, indent=4)
+
+                print("Save Checkpoint:[%d, %d, %f] successfully." % (seed, batch_size, learning_rate))
+                k += 1
+            j += 1
+            k = 0
+        i += 1
+        j = 0
+        k = 0
 
 
 if __name__=='__main__':
@@ -293,7 +383,7 @@ if __name__=='__main__':
     start_t = time()
 
     # experiments
-    for language_model_to_use in ["roberta", "roberta-large", "bert", "bert-large", "finbert", "flangbert", "flangroberta"]: #["xlnet", "pretrain_roberta"]:#
+    for language_model_to_use in ["roberta", "roberta-large", "bert", "bert-large", "finbert", "flangbert", "flangroberta", "xlnet", "xlm-roberta-base"]: #["xlnet", "pretrain_roberta"]:#
         for data_category in ["lab-manual-combine", "lab-manual-sp", "lab-manual-mm", "lab-manual-pc", "lab-manual-mm-split", "lab-manual-pc-split", "lab-manual-sp-split", "lab-manual-split-combine"]:
             train_data_path_prefix = "../training_data/test-and-training/training_data/" + data_category + "-train"
             test_data_path_prefix = "../training_data/test-and-training/test_data/" + data_category + "-test"
